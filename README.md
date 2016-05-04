@@ -1,7 +1,5 @@
 # GFW JSON Service
 
-[![Build Status](https://travis-ci.org/gfw-api/gfw-adapter-json.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-adapter-json) [![Code Climate](https://codeclimate.com/github/gfw-api/gfw-adapter-json/badges/gpa.svg)](https://codeclimate.com/github/gfw-api/gfw-adapter-json) [![Test Coverage](https://codeclimate.com/github/gfw-api/gfw-adapter-json/badges/coverage.svg)](https://codeclimate.com/github/gfw-api/gfw-adapter-json/coverage)
-
 TODO: Write a project description
 
 ## Installation
@@ -48,5 +46,5 @@ To run application:
 
 ### BEFORE CREATING A PULL REQUEST
 
-  Please check all of [these points](https://github.com/gfw-api/gfw-adapter-json/blob/master/CONTRIBUTING.md).
+  Please check all of [these points](https://github.com/gfw-api/gfw-json-adapter/blob/master/CONTRIBUTING.md).
 

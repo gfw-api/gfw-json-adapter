@@ -5,7 +5,7 @@ require 'mina/rvm'
 
 set :domain, 'ubuntu@ec2-52-23-163-254.compute-1.amazonaws.com'
 set :deploy_to, '/home/ubuntu/gfw-adapter-json'
-set :repository, 'https://github.com/gfw-api/gfw-adapter-json.git'
+set :repository, 'https://github.com/gfw-api/gfw-json-adapter.git'
 set :branch, 'master'
 set :rails_env, 'production'
 set :application, 'gfw-adapter-json'
