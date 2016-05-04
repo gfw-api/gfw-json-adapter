@@ -3,7 +3,7 @@ In the spirit of [free software][free-sw], **everyone** is encouraged to help im
 
 [free-sw]: http://www.fsf.org/licensing/essays/free-sw.html
 
-[issues]: https://github.com/gfw-api/gfw-adapter-json/issues
+[issues]: https://github.com/gfw-api/gfw-json-adapter/issues
 
 ## Submitting an Issue
 We use the [GitHub issue tracker][issues] to track bugs and features. Before

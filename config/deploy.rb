@@ -4,17 +4,17 @@ require 'mina/git'
 require 'mina/rvm'
 
 set :domain, 'ubuntu@ec2-52-23-163-254.compute-1.amazonaws.com'
-set :deploy_to, '/home/ubuntu/gfw-adapter-json'
-set :repository, 'https://github.com/gfw-api/gfw-adapter-json.git'
+set :deploy_to, '/home/ubuntu/gfw-json-adapter'
+set :repository, 'https://github.com/gfw-api/gfw-json-adapter.git'
 set :branch, 'master'
 set :rails_env, 'production'
-set :application, 'gfw-adapter-json'
+set :application, 'gfw-json-adapter'
 set :foreman_sudo, 'ubuntu'
 
 set :shared_paths, ['config/database.yml', 'config/secrets.yml', 'config/sidekiq.yml', 'log', '.env']
 
 task :environment do
-  invoke :'rvm:use[ruby-2.3.0@gfw-adapter-json]'
+  invoke :'rvm:use[ruby-2.3.0@gfw-json-adapter]'
 end
 
 task setup: :environment do
