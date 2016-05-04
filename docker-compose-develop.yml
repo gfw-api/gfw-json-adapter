@@ -4,4 +4,4 @@ web:
   ports:
     - "3000:3000"
   volumes:
-    - .:/gfw-adapter-json
+    - .:/gfw-json-adapter

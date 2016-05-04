@@ -1,5 +1,5 @@
 {
-    "id": "gfw-adapter-json_v1",
+    "id": "gfw-json-adapter_v1",
     "name": "RW Adapter Json v1",
     "urls": [{
         "url": "/query/:dataset",

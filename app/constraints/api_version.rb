@@ -12,6 +12,6 @@ class APIVersion
 
     def check_headers(headers)
       accept = headers['Accept']
-      accept && accept.include?("application/gfw-adapter-json-v#{@version}+json")
+      accept && accept.include?("application/gfw-json-adapter-v#{@version}+json")
     end
 end
