@@ -1,6 +1,6 @@
 # GFW JSON Service
 
-[![Build Status](https://travis-ci.org/gfw-api/gfw-adapter-json.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-adapter-json) [![Code Climate](https://codeclimate.com/github/gfw-api/gfw-adapter-json/badges/gpa.svg)](https://codeclimate.com/github/gfw-api/gfw-adapter-json)
+[![Build Status](https://travis-ci.org/gfw-api/gfw-adapter-json.svg?branch=master)](https://travis-ci.org/gfw-api/gfw-adapter-json) [![Code Climate](https://codeclimate.com/github/gfw-api/gfw-adapter-json/badges/gpa.svg)](https://codeclimate.com/github/gfw-api/gfw-adapter-json)
 
 TODO: Write a project description
 
