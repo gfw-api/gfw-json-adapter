@@ -1,0 +1,35 @@
+{
+    "id": "gfw-adapter-json_v1",
+    "name": "RW Adapter Json v1",
+    "urls": [{
+        "url": "/query/:dataset",
+        "method": "GET",
+        "paramProvider": "dataset",
+        "dataProvider": "dataset",
+        "filters":{
+            "provider": "RwJson"
+        },
+        "endpoints": [{
+            "method": "POST",
+            "baseUrl": "http://192.168.1.57:3000",
+            "path": "/query/:dataset",
+            "data": ["dataset"]
+        }]
+    },{
+        "url": "/json-datasets",
+        "method": "POST",
+        "endpoints": [{
+            "method": "POST",
+            "baseUrl": "http://192.168.1.57:3000",
+            "path": "/datasets"
+        }]
+    },{
+        "url": "/json-datasets/:id",
+        "method": "DELETE",
+        "endpoints": [{
+            "method": "DELETE",
+            "baseUrl": "http://192.168.1.57:3000",
+            "path": "/datasets/:id"
+        }]
+    }]
+}
