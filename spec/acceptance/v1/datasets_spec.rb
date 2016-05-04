@@ -67,7 +67,7 @@ module V1
 
       context 'Without params' do
         it 'Allows access cartoDB data' do
-          post "/query/#{dataset_id}", params: params
+          post "/summary/#{dataset_id}/query", params: params
 
           data = json['data'][0]
 
@@ -80,7 +80,7 @@ module V1
 
       context 'With params' do
         it 'Allows access cartoDB data with order ASC' do
-          post "/query/#{dataset_id}?order[]=cartodb_id", params: params
+          post "/summary/#{dataset_id}/query?order[]=cartodb_id", params: params
 
           data = json['data'][0]
 
@@ -89,7 +89,7 @@ module V1
         end
 
         it 'Allows access cartoDB data with order DESC' do
-          post "/query/#{dataset_id}?order[]=-cartodb_id", params: params
+          post "/summary/#{dataset_id}/query?order[]=-cartodb_id", params: params
 
           data = json['data'][0]
 
@@ -98,7 +98,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details with select and order' do
-          post "/query/#{dataset_id}?select[]=cartodb_id,pcpuid&order[]=pcpuid", params: params
+          post "/summary/#{dataset_id}/query?select[]=cartodb_id,pcpuid&order[]=pcpuid", params: params
 
           data = json['data'][0]
 
@@ -109,7 +109,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details with select, filter and order DESC' do
-          post "/query/#{dataset_id}?select[]=cartodb_id,pcpuid&filter=(cartodb_id==1,2,4,5 <and> pcpuid><'350558'..'9506590')&order[]=-pcpuid", params: params
+          post "/summary/#{dataset_id}/query?select[]=cartodb_id,pcpuid&filter=(cartodb_id==1,2,4,5 <and> pcpuid><'350558'..'9506590')&order[]=-pcpuid", params: params
 
           data = json['data'][0]
 
@@ -120,7 +120,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details with select, filter_not and order' do
-          post "/query/#{dataset_id}?select[]=cartodb_id,pcpuid&filter_not=(cartodb_id>=4 <and> pcpuid><'500001'..'9506590')&order[]=pcpuid", params: params
+          post "/summary/#{dataset_id}/query?select[]=cartodb_id,pcpuid&filter_not=(cartodb_id>=4 <and> pcpuid><'500001'..'9506590')&order[]=pcpuid", params: params
 
           data = json['data'][0]
 
@@ -131,7 +131,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details without select, all filters and order DESC' do
-          post "/query/#{dataset_id}?filter=(cartodb_id==5)&filter_not=(cartodb_id==4 <and> pcpuid><'500001'..'9506590')&order[]=-pcpuid", params: params
+          post "/summary/#{dataset_id}/query?filter=(cartodb_id==5)&filter_not=(cartodb_id==4 <and> pcpuid><'500001'..'9506590')&order[]=-pcpuid", params: params
 
           data = json['data'][0]
 
@@ -142,7 +142,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details for all filters, order and without select' do
-          post "/query/#{dataset_id}?filter=(cartodb_id<<5)&filter_not=(cartodb_id==4 <and> pcpuid><'500001'..'9506590')&order[]=-cartodb_id", params: params
+          post "/summary/#{dataset_id}/query?filter=(cartodb_id<<5)&filter_not=(cartodb_id==4 <and> pcpuid><'500001'..'9506590')&order[]=-cartodb_id", params: params
 
           data = json['data']
 
@@ -155,7 +155,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details for all filters without select and order' do
-          post "/query/#{dataset_id}?filter=(cartodb_id>=2)&filter_not=(cartodb_id==4 <and> pcpuid><'350659'..'9506590')", params: params
+          post "/summary/#{dataset_id}/query?filter=(cartodb_id>=2)&filter_not=(cartodb_id==4 <and> pcpuid><'350659'..'9506590')", params: params
 
           data = json['data']
 
@@ -167,7 +167,7 @@ module V1
         end
 
         it 'Allows access cartoDB data details for all filters' do
-          post "/query/#{dataset_id}?select[]=cartodb_id,pcpuid&filter=(cartodb_id<<5 <and> pcpuid>='350558')&filter_not=(cartodb_id==4 <and> pcpuid><'350640'..'9506590')&order[]=-pcpuid", params: params
+          post "/summary/#{dataset_id}/query?select[]=cartodb_id,pcpuid&filter=(cartodb_id<<5 <and> pcpuid>='350558')&filter_not=(cartodb_id==4 <and> pcpuid><'350640'..'9506590')&order[]=-pcpuid", params: params
 
           data = json['data']
 

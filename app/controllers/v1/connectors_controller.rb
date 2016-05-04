@@ -13,10 +13,8 @@ module V1
       begin
         @dataset = JsonConnector.build_dataset(connector_params)
         @dataset.save
-        notify('saved')
         render json: { success: true, message: 'Dataset created' }, status: 201
       rescue
-        notify
         render json: { success: false, message: 'Error creating dataset' }, status: 422
       end
     end
@@ -24,7 +22,6 @@ module V1
     def destroy
       @dataset.destroy
       begin
-        Dataset.notifier(params[:id], 'deleted') if ENV['API_DATASET_META_URL'].present?
         render json: { message: 'Dataset deleted' }, status: 200
       rescue ActiveRecord::RecordNotDestroyed
         return render json: @dataset.erors, message: 'Dataset could not be deleted', status: 422

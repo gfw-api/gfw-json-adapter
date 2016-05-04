@@ -57,14 +57,14 @@ module V1
       let!(:dataset_id) { Dataset.first.id }
 
       it 'Allows to create json dataset with data and data_attributes' do
-        post '/datasets', params: params
+        post '/summary/new', params: params
 
         expect(status).to eq(201)
         expect(json['message']).to eq('Dataset created')
       end
 
       it 'Allows to delete dataset' do
-        delete "/datasets/#{dataset_id}"
+        delete "/summary/#{dataset_id}"
 
         expect(status).to eq(200)
         expect(json['message']).to eq('Dataset deleted')
