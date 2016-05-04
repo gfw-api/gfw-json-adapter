@@ -48,5 +48,4 @@ To run application:
 
 ### BEFORE CREATING A PULL REQUEST
 
-Please check all of [these points](https://github.com/gfw-api/gfw-adapter-json/blob/master/CONTRIBUTING.md).
-
+  Please check all of [these points](https://github.com/gfw-api/gfw-adapter-json/blob/master/CONTRIBUTING.md).
