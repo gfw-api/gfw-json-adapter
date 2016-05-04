@@ -1,5 +1,7 @@
 # GFW JSON Service
 
+[![Build Status](https://travis-ci.org/gfw-api/gfw-adapter-json.svg?branch=master)](https://travis-ci.org/gfw-api/gfw-adapter-json)
+
 TODO: Write a project description
 
 ## Installation
