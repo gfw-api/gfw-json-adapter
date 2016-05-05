@@ -3,8 +3,12 @@ class DatasetParams < Hash
     sanitized_params = {
       id: params[:id] || nil,
       name: params[:name] || nil,
+      description: params[:description] || nil,
+      slug: params[:slug] || nil,
+      units: params[:units] || nil,
       provider: params[:provider] || nil,
       format: params[:format] || nil,
+      status: params[:status] || nil,
       data_path: params[:data_path] || nil,
       data_horizon: params[:data_horizon] || nil,
       attributes_path: params[:attributes_path] || nil,

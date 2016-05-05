@@ -1,8 +1,8 @@
 require 'acceptance_helper'
 
 module V1
-  describe 'Datasets Meta', type: :request do
-    context 'Create and delete dataset' do
+  describe 'Dataset', type: :request do
+    context 'Create, update and delete datasets' do
       let!(:data_columns) {{
                             "pcpuid": {
                               "type": "string"
@@ -45,22 +45,53 @@ module V1
                   }]}
 
       let!(:params) {{"connector": {
-                      "data_columns": Oj.dump(data_columns),
-                      "data": Oj.dump(data)
+                      "name": "First test dataset",
+                      "data_columns": data_columns,
+                      "data": data
                     }}}
 
+      let!(:update_params) {{"connector": {
+                             "name": "First test dataset update",
+                             "slug": "updated-first-test-dataset"
+                           }}}
+
       let!(:dataset) {
-        dataset = Dataset.create!(data: data, data_columns: data_columns)
+        dataset = Dataset.create!(data: data, data_columns: data_columns, name: 'Second test dataset', slug: 'second-test-dataset')
         dataset
       }
 
-      let!(:dataset_id) { Dataset.first.id }
+      let!(:dataset_id)   { Dataset.first.id   }
+      let!(:dataset_slug) { Dataset.first.slug }
+
+      it 'Show list of datasets' do
+        get '/summary?status=all'
+
+        expect(status).to eq(200)
+        expect(json.size).to eq(1)
+      end
+
+      it 'Show dataset by slug' do
+        get "/summary/#{dataset_slug}"
+
+        expect(status).to eq(200)
+        expect(json['slug']).to eq('second-test-dataset')
+      end
 
       it 'Allows to create json dataset with data and data_attributes' do
         post '/summary/new', params: params
 
         expect(status).to eq(201)
-        expect(json['message']).to eq('Dataset created')
+        expect(json['id']).to   be_present
+        expect(json['slug']).to eq('first-test-dataset')
+      end
+
+      it 'Allows to update dataset' do
+        put "/summary/#{dataset_slug}", params: update_params
+
+        expect(status).to eq(201)
+        expect(json['id']).to   be_present
+        expect(json['name']).to eq('First test dataset update')
+        expect(json['slug']).to eq('updated-first-test-dataset')
       end
 
       it 'Allows to delete dataset' do
@@ -69,6 +100,14 @@ module V1
         expect(status).to eq(200)
         expect(json['message']).to eq('Dataset deleted')
         expect(Dataset.where(id: dataset_id)).to be_empty
+      end
+
+      it 'Allows to delete dataset by slug' do
+        delete "/summary/#{dataset_slug}"
+
+        expect(status).to eq(200)
+        expect(json['message']).to eq('Dataset deleted')
+        expect(Dataset.where(slug: dataset_slug)).to be_empty
       end
     end
   end

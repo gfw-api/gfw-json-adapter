@@ -1,7 +1,7 @@
 require 'acceptance_helper'
 
 module V1
-  describe 'Datasets', type: :request do
+  describe 'Dataset Query', type: :request do
     context 'For specific dataset' do
       let!(:data_columns) {{
                             "pcpuid": {
@@ -45,11 +45,12 @@ module V1
                   }]}
 
       let!(:dataset) {
-        dataset = Dataset.create!(data: data, data_columns: data_columns)
+        dataset = Dataset.create!(data: data, data_columns: data_columns, name: 'First query dataset', slug: 'first-query-dataset')
         dataset
       }
 
-      let!(:dataset_id) { Dataset.first.id }
+      let!(:dataset_id)   { Dataset.first.id   }
+      let!(:dataset_slug) { Dataset.first.slug }
 
       let!(:params) {{"dataset": {
                       "id": "#{dataset_id}",
@@ -168,6 +169,18 @@ module V1
 
         it 'Allows access cartoDB data details for all filters' do
           post "/summary/#{dataset_id}/query?select[]=cartodb_id,pcpuid&filter=(cartodb_id<<5 <and> pcpuid>='350558')&filter_not=(cartodb_id==4 <and> pcpuid><'350640'..'9506590')&order[]=-pcpuid", params: params
+
+          data = json['data']
+
+          expect(status).to eq(200)
+          expect(data.size).to             eq(1)
+          expect(data[0]['cartodb_id']).to eq('2')
+          expect(data[0]['pcpuid']).not_to be_nil
+          expect(data[0]['the_geom']).to   be_nil
+        end
+
+        it 'Allows access cartoDB data details for all filters by slug' do
+          post "/summary/#{dataset_slug}/query?select[]=cartodb_id,pcpuid&filter=(cartodb_id<<5 <and> pcpuid>='350558')&filter_not=(cartodb_id==4 <and> pcpuid><'350640'..'9506590')&order[]=-pcpuid", params: params
 
           data = json['data']
 

@@ -1,5 +1,5 @@
 class ConnectorSerializer < ActiveModel::Serializer
-  attributes :id, :data_horizon, :clone_url, :data_attributes, :data
+  attributes :id, :data_attributes, :data
 
   def clone_url
     data = {}
@@ -22,7 +22,7 @@ class ConnectorSerializer < ActiveModel::Serializer
   end
 
   def clone_uri
-    "#{@uri['api_gateway_url']}/datasets/#{object.id}/clone"
+    "#{@uri['api_gateway_url']}/summary/#{object.id}/clone"
   end
 
   def body_params
