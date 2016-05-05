@@ -15,7 +15,7 @@ module V1
     end
 
     def data
-      render json: @connector, serializer: ConnectorSerializer, query_filter: @query_filter, root: false, uri: @uri
+      render json: @connector, serializer: ConnectorSerializer, query_filter: @query_filter, root: false
     end
 
     def update

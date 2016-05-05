@@ -23,8 +23,8 @@ class Dataset < ApplicationRecord
   HORIZON = %w(infinitely).freeze
 
   after_create :update_slug
-  after_create :update_data_columns, if: 'data.any? && data_columns == data.first'
-  before_save  :set_data_count,      if: 'data.any? && data_changed?'
+  after_create :update_data_columns, if: 'data[0].present? && data_columns == data.first'
+  before_save  :set_data_count,      if: 'data[0].present? && data_changed?'
 
   before_update :assign_slug
 
@@ -32,11 +32,12 @@ class Dataset < ApplicationRecord
     check_slug
   end
 
+  validates :name, presence: true
   validates :slug, presence: true, format: { with: /\A[^\s!#$%^&*()（）=+;:'"\[\]\{\}|\\\/<>?,]+\z/,
                                              allow_blank: true,
-                                             message: 'Slug invalid. Slug must contain at least one letter'
+                                             message: 'invalid. Slug must contain at least one letter and no special character'
                                            }
-  validates_uniqueness_of :slug
+  validates_uniqueness_of :name, :slug
 
   scope :recent,           -> { order('updated_at DESC') }
   scope :filter_pending,   -> { where(status: 0)         }
@@ -65,11 +66,6 @@ class Dataset < ApplicationRecord
       DatasetServiceJob.perform_later(object_id, status)
     end
 
-    def build_dataset(params)
-      params.permit!
-      Dataset.new(params)
-    end
-
     def find_by_id_or_slug(param)
       dataset_id = self.where(slug: param).or(self.where(id: param)).pluck(:id).min
       self.find(dataset_id) rescue nil
@@ -81,7 +77,7 @@ class Dataset < ApplicationRecord
       case status
       when 'pending'  then filter_pending.recent
       when 'active'   then filter_actives.recent
-      when 'disabled' then filter_disabled.recent
+      when 'disabled' then filter_inactives.recent
       when 'all'      then recent
       else
         filter_actives.recent
