@@ -32,7 +32,10 @@ class Dataset < ApplicationRecord
     check_slug
   end
 
-  validates :slug, presence: true, format: { with: /[A-Z\[\\\]^_`a-z]/, allow_blank: true, message: 'Slug invalid. Slug must contain at least one letter' }
+  validates :slug, presence: true, format: { with: /\A[^\s!#$%^&*()（）=+;:'"\[\]\{\}|\\\/<>?,]+\z/,
+                                             allow_blank: true,
+                                             message: 'Slug invalid. Slug must contain at least one letter'
+                                           }
   validates_uniqueness_of :slug
 
   scope :recent,           -> { order('updated_at DESC') }
