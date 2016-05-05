@@ -56,25 +56,65 @@ module V1
                            }}}
 
       let!(:dataset) {
-        dataset = Dataset.create!(data: data, data_columns: data_columns, name: 'Second test dataset', slug: 'second-test-dataset')
-        dataset
+        Dataset.create!(data: data, data_columns: data_columns, name: 'Second test dataset', slug: 'second-test-dataset')
       }
 
       let!(:dataset_id)   { Dataset.first.id   }
       let!(:dataset_slug) { Dataset.first.slug }
 
-      it 'Show list of datasets' do
-        get '/summary?status=all'
+      context 'List fliters' do
+        let!(:disabled_dataset) {
+          Dataset.create!(data: data, data_columns: data_columns, name: 'disabled dataset', slug: 'disabled-dataset', status: 2)
+        }
 
-        expect(status).to eq(200)
-        expect(json.size).to eq(1)
+        let!(:enabled_dataset) {
+          Dataset.create!(data: data, data_columns: data_columns, name: 'enabled dataset', slug: 'enabled-dataset', status: 1)
+        }
+
+        it 'Show list of all datasets' do
+          get '/summary?status=all'
+
+          expect(status).to eq(200)
+          expect(json.size).to eq(3)
+        end
+
+        it 'Show list of datasets with pending status' do
+          get '/summary?status=pending'
+
+          expect(status).to eq(200)
+          expect(json.size).to eq(1)
+        end
+
+        it 'Show list of datasets with active status' do
+          get '/summary?status=active'
+
+          expect(status).to eq(200)
+          expect(json.size).to eq(1)
+        end
+
+        it 'Show list of datasets with disabled status' do
+          get '/summary?status=disabled'
+
+          expect(status).to eq(200)
+          expect(json.size).to eq(1)
+        end
+
+        it 'Show list of datasets' do
+          get '/summary'
+
+          expect(status).to eq(200)
+          expect(json.size).to eq(1)
+        end
       end
 
       it 'Show dataset by slug' do
         get "/summary/#{dataset_slug}"
 
         expect(status).to eq(200)
-        expect(json['slug']).to eq('second-test-dataset')
+        expect(json['slug']).to    eq('second-test-dataset')
+        expect(json['meta']['status']).to  eq('pending')
+        expect(json['meta']['horizon']).to eq('infinitely')
+        expect(json['meta']['format']).to  eq('JSON')
       end
 
       it 'Allows to create json dataset with data and data_attributes' do
