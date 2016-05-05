@@ -3,15 +3,54 @@
 # Table name: datasets
 #
 #  id           :uuid             not null, primary key
-#  data_columns :jsonb            default("{}")
-#  data         :jsonb            default("[]")
-#  data_horizon :integer          default("0")
+#  data_columns :jsonb
+#  data         :jsonb
+#  data_horizon :integer          default(0)
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  name         :string           not null
+#  slug         :string
+#  units        :string
+#  description  :text
+#  format       :integer          default(0)
+#  row_count    :integer
+#  status       :integer          default(0)
 #
 
 class Dataset < ApplicationRecord
+  FORMAT  = %w(JSON).freeze
+  STATUS  = %w(pending active disabled).freeze
+  HORIZON = %w(infinitely).freeze
+
+  after_create :update_slug
   after_create :update_data_columns, if: 'data.any? && data_columns == data.first'
+  before_save  :set_data_count,      if: 'data.any? && data_changed?'
+
+  before_update :assign_slug
+
+  before_validation(on: [:create, :update]) do
+    check_slug
+  end
+
+  validates :slug, presence: true, format: { with: /[A-Z\[\\\]^_`a-z]/, allow_blank: true, message: 'Slug invalid. Slug must contain at least one letter' }
+  validates_uniqueness_of :slug
+
+  scope :recent,           -> { order('updated_at DESC') }
+  scope :filter_pending,   -> { where(status: 0)         }
+  scope :filter_actives,   -> { where(status: 1)         }
+  scope :filter_inactives, -> { where(status: 2)         }
+
+  def format_txt
+    FORMAT[format - 0]
+  end
+
+  def status_txt
+    STATUS[status - 0]
+  end
+
+  def horizon_txt
+    HORIZON[data_horizon - 0]
+  end
 
   class << self
     def execute_data_query(sql_to_run)
@@ -27,18 +66,52 @@ class Dataset < ApplicationRecord
       params.permit!
       Dataset.new(params)
     end
+
+    def find_by_id_or_slug(param)
+      dataset_id = self.where(slug: param).or(self.where(id: param)).pluck(:id).min
+      self.find(dataset_id) rescue nil
+    end
+
+    def fetch_all(options)
+      status = options['status'] if options['status'].present?
+
+      case status
+      when 'pending'  then filter_pending.recent
+      when 'active'   then filter_actives.recent
+      when 'disabled' then filter_disabled.recent
+      when 'all'      then recent
+      else
+        filter_actives.recent
+      end
+    end
   end
 
   private
 
+    def check_slug
+      self.slug = self.name.downcase.parameterize if self.name && self.slug.blank?
+    end
+
+    def assign_slug
+      self.slug = self.slug.downcase.parameterize
+    end
+
+    def update_slug
+      update_attributes(slug: assign_slug)
+    end
+
     def update_data_columns
-      self.update_attributes(data_columns: ActiveRecord::Base.connection.execute(update_meta_data).map { |v| { v['key'] => { type: v['type'] } } })
+      update_attributes(data_columns: ActiveRecord::Base.connection.execute(update_meta_data).map { |v| { v['key'] => { type: v['type'] } } })
+    end
+
+    def set_data_count
+      self.row_count = ActiveRecord::Base.connection.execute(count_data).to_a.first['count']
     end
 
     def update_meta_data
       dataset_id = ActiveRecord::Base.send(:sanitize_sql_array, ['id = :dataset_id', dataset_id: self.id])
       <<-SQL
-        with types as (
+        with types AS (
           SELECT
               json_data.key AS key,
               CASE WHEN left(json_data.value::text,1) = '"'  THEN 'string'
@@ -51,10 +124,20 @@ class Dataset < ApplicationRecord
                    WHEN json_data.value::text in ('true', 'false')  THEN 'boolean'
                    WHEN json_data.value::text = 'null'  THEN 'null'
                    ELSE 'integer'
-              END as type
-          FROM datasets, jsonb_each(datasets.data_columns) AS json_data where #{dataset_id}
+              END AS type
+          FROM datasets, jsonb_each(datasets.data_columns) AS json_data WHERE #{dataset_id}
         )
-        select * from types;
+        SELECT * from types;
+      SQL
+    end
+
+    def count_data
+      dataset_id = ActiveRecord::Base.send(:sanitize_sql_array, ['id = :dataset_id', dataset_id: self.id])
+      <<-SQL
+        WITH t AS (
+          SELECT
+              jsonb_array_elements(data) AS data FROM datasets WHERE #{dataset_id}
+          ) SELECT count(*) FROM t;
       SQL
     end
 end

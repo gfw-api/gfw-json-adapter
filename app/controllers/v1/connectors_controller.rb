@@ -1,19 +1,39 @@
 module V1
   class ConnectorsController < ApplicationController
-    before_action :set_connector
-    before_action :set_query_filter
-    before_action :set_uri
-    before_action :set_dataset, only: :destroy
+    before_action :set_dataset,      only: [:show, :update, :destroy]
+    before_action :set_connector,    only: :data
+    before_action :set_query_filter, only: :data
+    before_action :set_uri,          only: :data
+
+    def index
+      @connectors = Dataset.fetch_all(dataset_type_filter)
+      render json: @connectors, each_serializer: DatasetArraySerializer, root: false
+    end
 
     def show
+      render json: @dataset, serializer: DatasetSerializer, root: false
+    end
+
+    def data
       render json: @connector, serializer: ConnectorSerializer, query_filter: @query_filter, root: false, uri: @uri
+    end
+
+    def update
+      if @dataset.update(connector_params)
+        render json: @dataset, status: 201, serializer: DatasetSerializer, root: false
+      else
+        render json: { success: false, message: 'Error updateding dataset' }, status: 422
+      end
     end
 
     def create
       begin
         @dataset = JsonConnector.build_dataset(connector_params)
-        @dataset.save
-        render json: { success: true, message: 'Dataset created' }, status: 201
+        if @dataset.save
+          render json: @dataset, status: 201, serializer: DatasetSerializer, root: false
+        else
+          render json: { success: false, message: 'Error creating dataset' }, status: 422
+        end
       rescue
         render json: { success: false, message: 'Error creating dataset' }, status: 422
       end
@@ -31,29 +51,31 @@ module V1
     private
 
       def set_connector
-        @connector = JsonConnector.new(params) if params[:dataset].present? || params[:connector].present?
+        @connector = JsonConnector.new(params)
       end
 
       def set_dataset
-        @dataset = Dataset.find(params[:id])
+        @dataset = Dataset.find_by_id_or_slug(params[:id])
       end
 
       def set_query_filter
         @query_filter = {}
-        @query_filter['select']     = params[:select] if params[:select].present?
-        @query_filter['order']      = params[:order]  if params[:order].present?
-        # For Filter
+        @query_filter['select']     = params[:select]     if params[:select].present?
+        @query_filter['order']      = params[:order]      if params[:order].present?
         @query_filter['filter']     = params[:filter]     if params[:filter].present?
         @query_filter['filter_not'] = params[:filter_not] if params[:filter_not].present?
-        # For group
-        @query_filter['aggr_by']    = params[:aggr_by]   if params[:aggr_by].present?
-        @query_filter['aggr_func']  = params[:aggr_func] if params[:aggr_func].present?
+        @query_filter['aggr_by']    = params[:aggr_by]    if params[:aggr_by].present?
+        @query_filter['aggr_func']  = params[:aggr_func]  if params[:aggr_func].present?
       end
 
       def set_uri
         @uri = {}
         @uri['api_gateway_url'] = ENV['API_GATEWAY_URL'] if ENV['API_GATEWAY_URL'].present?
         @uri['full_path']       = request.fullpath
+      end
+
+      def dataset_type_filter
+        params.permit(:status)
       end
 
       def notify(status=nil)

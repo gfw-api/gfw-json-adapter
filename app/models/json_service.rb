@@ -23,7 +23,7 @@ class JsonService
     end
 
     def index_query
-      Dataset.find(@id).data
+      Dataset.find_by_id_or_slug(@id).data
     end
 
     def options_query
@@ -35,7 +35,7 @@ class JsonService
       # WHERE NOT
       filter += ' AND' if @not_filter.present? && @filter.present?
       filter += Filters::FilterWhere.apply_where(nil, @not_filter) if @not_filter.present?
-      # # GROUP BY
+      # TODO: GROUP BY function
       # filter += Filters::GroupBy.apply_group_by(@aggr_by) if @aggr_func.present? && @aggr_by.present?
       # ORDER
       filter += Filters::Order.apply_order(@order) if @order.present?

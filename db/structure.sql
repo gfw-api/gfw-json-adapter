@@ -83,7 +83,14 @@ CREATE TABLE datasets (
     data jsonb DEFAULT '"[]"'::jsonb,
     data_horizon integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    name character varying NOT NULL,
+    slug character varying,
+    units character varying,
+    description text,
+    format integer DEFAULT 0,
+    row_count integer,
+    status integer DEFAULT 0
 );
 
 
@@ -135,11 +142,18 @@ CREATE INDEX index_datasets_on_data_columns ON datasets USING gin (data_columns)
 
 
 --
+-- Name: index_datasets_on_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_datasets_on_slug ON datasets USING btree (slug);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES ('20160420135203'), ('20160420135313');
+INSERT INTO schema_migrations (version) VALUES ('20160420135203'), ('20160420135313'), ('20160504154550');
 
 
