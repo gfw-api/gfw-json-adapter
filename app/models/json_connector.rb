@@ -38,7 +38,7 @@ class JsonConnector
     params['description']  = options['description']
     params['data_horizon'] = options['data_horizon'].present? ? options['data_horizon'] : 0
 
-    params['data_columns'] = if options['connector_url'].present? && options['data_columns'].blank?
+    params['data_columns'] = if options['data_columns'].blank?
                                params['data'].first
                              else
                                data_columns = Oj.dump(options['data_columns'])
