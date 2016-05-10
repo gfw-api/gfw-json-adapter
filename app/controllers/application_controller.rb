@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::API
   include ActionController::HttpAuthentication::Basic::ControllerMethods
-  http_basic_authenticate_with name: ENV['ACCESS_USER'], password: ENV['ACCESS_PASSWORD'] if ENV['ACCESS'].present? && ENV['ACCESS'].include?('private')
 
   rescue_from Exception do |e|
     error(e)
@@ -20,5 +19,11 @@ class ApplicationController < ActionController::API
       else
         raise e
       end
+    end
+
+    def basic_auth
+      authenticate_or_request_with_http_basic("Administration") do |user, pass|
+        user == ENV["ACCESS_USER"] && pass = ENV["ACCESS_PASSWORD"]
+      end if ENV['ACCESS'].present? && ENV['ACCESS'].include?('private')
     end
 end

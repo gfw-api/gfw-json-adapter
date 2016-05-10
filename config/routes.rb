@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     get    'summary/:id',       to: 'connectors#show'
     put    'summary/:id',       to: 'connectors#update'
     post   'summary/:id/query', to: 'connectors#data'
+    get    'summary/:id/query', to: 'connectors#data'
     post   'summary/new',       to: 'connectors#create'
     delete 'summary/:id',       to: 'connectors#destroy'
   end

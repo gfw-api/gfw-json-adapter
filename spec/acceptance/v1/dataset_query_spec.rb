@@ -190,6 +190,18 @@ module V1
           expect(data[0]['pcpuid']).not_to be_nil
           expect(data[0]['the_geom']).to   be_nil
         end
+
+        it 'Allows access cartoDB data details for all filters by slug via GET' do
+          get "/summary/#{dataset_slug}/query?select[]=cartodb_id,pcpuid&filter=(cartodb_id<<5 <and> pcpuid>='350558')&filter_not=(cartodb_id==4 <and> pcpuid><'350640'..'9506590')&order[]=-pcpuid"
+
+          data = json['data']
+
+          expect(status).to eq(200)
+          expect(data.size).to             eq(1)
+          expect(data[0]['cartodb_id']).to eq('2')
+          expect(data[0]['pcpuid']).not_to be_nil
+          expect(data[0]['the_geom']).to   be_nil
+        end
       end
     end
   end
