@@ -22,7 +22,6 @@ class Dataset < ApplicationRecord
   STATUS  = %w(pending active disabled).freeze
   HORIZON = %w(infinitely).freeze
 
-  after_create :update_slug
   after_create :update_data_columns, if: 'data[0].present? && data_columns == data.first'
   before_save  :set_data_count,      if: 'data[0].present? && data_changed?'
 
@@ -67,8 +66,8 @@ class Dataset < ApplicationRecord
     end
 
     def find_by_id_or_slug(param)
-      dataset_id = self.where(slug: param).or(self.where(id: param)).pluck(:id).min
-      self.find(dataset_id) rescue nil
+      dataset_id = where(slug: param).or(where(id: param)).pluck(:id).min
+      find(dataset_id) rescue nil
     end
 
     def fetch_all(options)
@@ -88,15 +87,11 @@ class Dataset < ApplicationRecord
   private
 
     def check_slug
-      self.slug = self.name.downcase.parameterize if self.name && self.slug.blank?
+      self.slug = self.name.downcase.parameterize if self.name.present? && self.slug.blank?
     end
 
     def assign_slug
       self.slug = self.slug.downcase.parameterize
-    end
-
-    def update_slug
-      update_attributes(slug: assign_slug)
     end
 
     def update_data_columns
@@ -104,7 +99,7 @@ class Dataset < ApplicationRecord
     end
 
     def set_data_count
-      self.row_count = ActiveRecord::Base.connection.execute(count_data).to_a.first['count']
+      self.row_count = self.data.length
     end
 
     def update_meta_data
@@ -127,16 +122,6 @@ class Dataset < ApplicationRecord
           FROM datasets, jsonb_each(datasets.data_columns) AS json_data WHERE #{dataset_id}
         )
         SELECT * from types;
-      SQL
-    end
-
-    def count_data
-      dataset_id = ActiveRecord::Base.send(:sanitize_sql_array, ['id = :dataset_id', dataset_id: self.id])
-      <<-SQL
-        WITH t AS (
-          SELECT
-              jsonb_array_elements(data) AS data FROM datasets WHERE #{dataset_id}
-          ) SELECT count(*) FROM t;
       SQL
     end
 end
