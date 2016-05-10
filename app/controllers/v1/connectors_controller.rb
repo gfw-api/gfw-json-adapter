@@ -1,5 +1,6 @@
 module V1
   class ConnectorsController < ApplicationController
+    before_action :basic_auth,       only: [:update, :create, :destroy]
     before_action :set_dataset,      only: [:show, :update, :destroy]
     before_action :set_connector,    only: :data
     before_action :set_query_filter, only: :data
