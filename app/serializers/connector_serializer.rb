@@ -1,5 +1,5 @@
 class ConnectorSerializer < ActiveModel::Serializer
-  attributes :id, :data_attributes, :data
+  attributes :id, :slug, :name, :units, :description, :data_attributes, :data
 
   def data
     object.data(@query_filter)

@@ -45,7 +45,7 @@ module V1
                   }]}
 
       let!(:dataset) {
-        dataset = Dataset.create!(data: data, data_columns: data_columns, name: 'First query dataset', slug: 'first-query-dataset')
+        dataset = Dataset.create!(data: data, data_columns: data_columns, name: 'First query dataset', slug: 'first-query-dataset', units: 'Hectars', description: 'Lorem ipsum...')
         dataset
       }
 
@@ -201,6 +201,24 @@ module V1
           expect(data[0]['cartodb_id']).to eq('2')
           expect(data[0]['pcpuid']).not_to be_nil
           expect(data[0]['the_geom']).to   be_nil
+        end
+
+        it 'Allows access cartoDB data details for all filters by slug without select and order' do
+          get "/summary/#{dataset_slug}/query?filter=(cartodb_id>=2)&filter_not=(cartodb_id==4 <and> pcpuid><'350659'..'9506590')"
+
+          data = json['data']
+
+          expect(status).to eq(200)
+          expect(json['id']).to              eq(dataset.id)
+          expect(json['slug']).to            eq('first-query-dataset')
+          expect(json['name']).to            eq('First query dataset')
+          expect(json['units']).to           eq('Hectars')
+          expect(json['description']).to     eq('Lorem ipsum...')
+          expect(json['data_attributes']).to be_present
+          expect(data[0]['cartodb_id']).to   eq('2')
+          expect(data[0]['pcpuid']).not_to   be_nil
+          expect(data[0]['the_geom']).not_to be_nil
+          expect(data[1]['cartodb_id']).to   eq('5')
         end
       end
     end
