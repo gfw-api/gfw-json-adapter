@@ -2,20 +2,17 @@ require 'oj'
 
 class JsonConnector
   include ActiveModel::Serialization
-  attr_reader :id
+  attr_reader :id, :slug, :name, :description, :units, :data_columns
 
   def initialize(params)
     @dataset_params = params
     initialize_options
+    initialize_dataset
   end
 
   def data(options = {})
     get_data = JsonService.new(@id, options)
     get_data.connect_data
-  end
-
-  def data_columns
-    Dataset.find_by_id_or_slug(@id).try(:data_columns)
   end
 
   def self.build_dataset(options)
@@ -52,5 +49,10 @@ class JsonConnector
     def initialize_options
       @options = DatasetParams.sanitize(@dataset_params)
       @options.keys.each { |k| instance_variable_set("@#{k}", @options[k]) }
+    end
+
+    def initialize_dataset
+      @dataset_params = Dataset.find_by_id_or_slug(@id).attributes.except('data', 'data_horizon', 'created_at', 'updated_at', 'format', 'row_count', 'status').to_hash
+      @dataset_params.keys.each { |k| instance_variable_set("@#{k}", @dataset_params[k]) }
     end
 end
