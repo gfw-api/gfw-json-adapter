@@ -44,6 +44,17 @@ module V1
                       "cartodb_id": 1
                   }]}
 
+      let!(:short_data) {[{
+                          "pcpuid": "350558",
+                          "the_geom": "0101000020E610000000000000786515410000000078651541",
+                          "cartodb_id": 2
+                        },
+                        {
+                          "pcpuid": "350659",
+                          "the_geom": "0101000020E6100000000000000C671541000000000C671541",
+                          "cartodb_id": 3
+                        }]}
+
       let!(:params) {{"connector": {
                       "name": "First test dataset",
                       "data_columns": data_columns,
@@ -52,7 +63,8 @@ module V1
 
       let!(:update_params) {{"connector": {
                              "name": "First test dataset update",
-                             "slug": "updated-first-test-dataset"
+                             "slug": "updated-first-test-dataset",
+                             "data": short_data
                            }}}
 
       let!(:dataset) {
@@ -111,10 +123,11 @@ module V1
         get "/summary/#{dataset_slug}"
 
         expect(status).to eq(200)
-        expect(json['slug']).to    eq('second-test-dataset')
+        expect(json['slug']).to            eq('second-test-dataset')
         expect(json['meta']['status']).to  eq('pending')
         expect(json['meta']['horizon']).to eq('infinitely')
         expect(json['meta']['format']).to  eq('JSON')
+        expect(json['meta']['rows']).to    eq(5)
       end
 
       it 'Allows to create json dataset with data and data_attributes' do
@@ -129,9 +142,10 @@ module V1
         put "/summary/#{dataset_slug}", params: update_params
 
         expect(status).to eq(201)
-        expect(json['id']).to   be_present
-        expect(json['name']).to eq('First test dataset update')
-        expect(json['slug']).to eq('updated-first-test-dataset')
+        expect(json['id']).to           be_present
+        expect(json['name']).to         eq('First test dataset update')
+        expect(json['slug']).to         eq('updated-first-test-dataset')
+        expect(json['meta']['rows']).to eq(2)
       end
 
       it 'Allows to delete dataset' do
