@@ -14,6 +14,7 @@ produces:
 paths:
   /summary:
     get:
+      summary: List of datasets
       description: Returns all datasets
       produces:
         - application/json
@@ -48,7 +49,7 @@ paths:
         201:
           description: The object created
           schema:
-            $ref: '#/definitions/DatasetDetail'
+            $ref: '#/definitions/DatasetDetails'
         400:
           description: Validate error
           schema:
@@ -60,6 +61,7 @@ paths:
 
   /summary/{id}:
     get:
+      summary: Dataset details
       description: Returns dataset based on a single ID, if the geostore not exist return 404
       produces:
         - application/json
@@ -75,7 +77,7 @@ paths:
         200:
           description: Dataset obtained
           schema:
-            $ref: '#/definitions/DatasetDetail'
+            $ref: '#/definitions/DatasetDetails'
         404:
           description: Dataset not found
           schema:
@@ -86,6 +88,7 @@ paths:
             $ref: '#/definitions/Error'
 
     put:
+      summary: Update dataset
       description: Update dataset based on a single ID, if the geostore not exist return 404
       produces:
         - application/json
@@ -107,7 +110,7 @@ paths:
         200:
           description: Dataset updated
           schema:
-            $ref: '#/definitions/DatasetDetail'
+            $ref: '#/definitions/DatasetDetails'
         404:
           description: Dataset not found
           schema:
@@ -118,6 +121,7 @@ paths:
             $ref: '#/definitions/Error'
 
     delete:
+      summary: Delete dataset
       description: Delete dataset based on a single ID, if the geostore not exist return 404
       produces:
         - application/json
@@ -145,6 +149,7 @@ paths:
 
   /summary/{id}/query:
     get:
+      summary: Dataset's data
       description: Do query to dataset
       produces:
         - application/json
@@ -170,18 +175,12 @@ paths:
           type: string
         - name: filter
           in: query
-          description: WHERE clausule of the query to filter data. (<column_name> <operator> <value> <and/or> ...). <br>Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
+          description: WHERE clausule of the query to filter data. (<column_name> <operator> <value> <and/or> ...). Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
           type: string
         - name: filter_not
           in: query
-          description: WHERE clausule denied of the query to filter data. (<column_name> <operator> <value> <and/or> ...). <br>Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
+          description: WHERE clausule denied of the query to filter data. (<column_name> <operator> <value> <and/or> ...). Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
           type: string
-        - name: dataset
-          in: body
-          description: Dataset to do query
-          required: true
-          schema:
-            $ref: '#/definitions/DatasetCreate'
       responses:
         200:
           description: Results obtained
@@ -225,7 +224,7 @@ definitions:
           data_columns:
             type: object
 
-  DatasetDetail:
+  DatasetDetails:
     type: object
     properties:
       id:
