@@ -1,0 +1,315 @@
+swagger: '2.0'
+info:
+  title: Global Forest Watch dataset API
+  description: Global Forest Watch dataset API
+  version: "1.0.0"
+host: gfw-json-adapter.herokuapp.com
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+paths:
+  /summary:
+    get:
+      summary: List of datasets
+      description: Returns all datasets
+      produces:
+        - application/json
+      tags:
+        - Dataset
+      responses:
+        200:
+          description: Datasets obtained
+          schema:
+            $ref: '#/definitions/Datasets'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /summary/new:
+    post:
+      summary: Create dataset
+      description: Create dataset
+      produces:
+        - application/json
+      tags:
+        - Dataset
+      parameters:
+        - name: connector
+          in: body
+          description: Dataset to save
+          required: true
+          schema:
+            $ref: '#/definitions/DatasetCreate'
+      responses:
+        201:
+          description: The object created
+          schema:
+            $ref: '#/definitions/DatasetDetails'
+        400:
+          description: Validate error
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /summary/{id}:
+    get:
+      summary: Dataset details
+      description: Returns dataset based on a single ID, if the geostore not exist return 404
+      produces:
+        - application/json
+      tags:
+        - Dataset
+      parameters:
+        - name: id
+          in: path
+          description: ID of dataset to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: Dataset obtained
+          schema:
+            $ref: '#/definitions/DatasetDetails'
+        404:
+          description: Dataset not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Update dataset
+      description: Update dataset based on a single ID, if the geostore not exist return 404
+      produces:
+        - application/json
+      tags:
+        - Dataset
+      parameters:
+        - name: id
+          in: path
+          description: ID of dataset to update
+          required: true
+          type: string
+        - name: dataset
+          in: body
+          description: New data of the dataset
+          required: true
+          schema:
+            $ref: '#/definitions/DatasetCreate'
+      responses:
+        200:
+          description: Dataset updated
+          schema:
+            $ref: '#/definitions/DatasetDetails'
+        404:
+          description: Dataset not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Delete dataset
+      description: Delete dataset based on a single ID, if the geostore not exist return 404
+      produces:
+        - application/json
+      tags:
+        - Dataset
+      parameters:
+        - name: id
+          in: path
+          description: ID of dataset to delete
+          required: true
+          type: string
+      responses:
+        200:
+          description: Dataset updated
+          schema:
+            $ref: '#/definitions/Message'
+        404:
+          description: Dataset not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /summary/{id}/query:
+    get:
+      summary: Dataset's data
+      description: Do query to dataset
+      produces:
+        - application/json
+      tags:
+        - Query
+      parameters:
+        - name: id
+          in: path
+          description: ID of dataset to do query
+          required: true
+          type: string
+        - name: select
+          in: query
+          description: Names of columns (separated by comma) to obtain. example iso,population
+          type: string
+        - name: order
+          in: query
+          description: Names of colums (separated by comma) to order data. example iso,population. With - prefix, DESC order. Without prefix, ASC order.
+          type: string
+        - name: aggr_by
+          in: query
+          description: Names of colums (separated by comma) to group data. example iso,population.
+          type: string
+        - name: filter
+          in: query
+          description: WHERE clausule of the query to filter data. (<column_name> <operator> <value> <and/or> ...). Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
+          type: string
+        - name: filter_not
+          in: query
+          description: WHERE clausule denied of the query to filter data. (<column_name> <operator> <value> <and/or> ...). Operators->  == (equal) <= (less than or equal) >= (greater than or equal) >> (greather than) << (less than) >< (between - sample pcpuid><'500001'..'9506590');
+          type: string
+      responses:
+        200:
+          description: Results obtained
+          schema:
+            $ref: '#/definitions/DatasetQuery'
+        404:
+          description: Dataset/Query not found
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Data:
+    type: object
+
+  DatasetCreate:
+    type: object
+    properties:
+      connector:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Name of the dataset
+          slug:
+            type: string
+            description: Url of dataset
+          units:
+            type: string
+          status:
+            type: boolean
+          description:
+            type: string
+          data:
+            type: array
+            items:
+              $ref: '#/definitions/Data'
+          data_columns:
+            type: object
+
+  DatasetDetails:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      units:
+        type: string
+      description:
+        type: string
+      meta:
+        type: object
+        properties:
+          format:
+            type: string
+          status:
+            type: string
+          horizon:
+            type: string
+          updated_at:
+            type: string
+          created_at:
+            type: string
+          data_attributes:
+            type: object
+          rows:
+            type: number
+
+  Datasets:
+    type: array
+    items:
+      $ref: '#/definitions/Dataset'
+
+  Dataset:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Dataset uuid
+      name:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+
+  DatasetQuery:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      units:
+        type: string
+      description:
+        type: string
+      data_attributes:
+        type: object
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Data'
+
+  Message:
+    type: object
+    properties:
+      status:
+        type: number
+      message:
+        type: string
+
+  Error:
+    type: object
+    properties:
+      status:
+        type: string
+        description: The HTTP status code applicable to this problem, expressed as a string value
+      error:
+        type: string
+        description: An application-specific error code, expressed as a string value
+      exception:
+        type: string
+        description: A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
